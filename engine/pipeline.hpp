@@ -17,15 +17,22 @@
 namespace engine
 {
     struct PipelineConfigInfo{
+        PipelineConfigInfo() = default;
+
+        // avoid copying the pipeline config info
+        PipelineConfigInfo(const PipelineConfigInfo&) = delete;
+        PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
+
         VkViewport viewport;
         VkRect2D scissor;
-        VkPipelineViewportStateCreateInfo viewportInfo;
+        // VkPipelineViewportStateCreateInfo viewportInfo;
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
         VkPipelineRasterizationStateCreateInfo rasterizationInfo;
         VkPipelineMultisampleStateCreateInfo multisampleInfo;
         VkPipelineColorBlendAttachmentState colorBlendAttachment;
         VkPipelineColorBlendStateCreateInfo colorBlendInfo;
         VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+        // Pipeline layout will be created in app launcher separately
         VkPipelineLayout pipelineLayout = nullptr;
         VkRenderPass renderPass = nullptr;
         uint32_t subpass = 0;
@@ -44,7 +51,10 @@ namespace engine
             Pipeline(const Pipeline&) = delete;
             void operator=(const Pipeline&) = delete;
 
-            static PipelineConfigInfo defaultPipelineConfigInfo(uint32_t width, uint32_t height);
+            void bind(VkCommandBuffer commandBuffer);
+
+            static void defaultPipelineConfigInfo(
+                PipelineConfigInfo& configinfo, uint32_t width, uint32_t height);
 
         private:
             static std::vector<char> readFile (const std::string& filename);
