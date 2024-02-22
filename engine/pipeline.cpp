@@ -1,4 +1,5 @@
 #include "pipeline.hpp"
+#include "model.hpp"
 
 #include <cassert>
 #include <stdexcept>
@@ -70,13 +71,17 @@ namespace engine
         shaderStages[1].flags = 0;
         shaderStages[1].pNext = nullptr;
         shaderStages[1].pSpecializationInfo = nullptr;
-        // set up the vertex input
+
+        // manage the vertex input as the same description as the model
+        auto bindingDescriptions = Model::Vertex::getBindingDescription();
+        auto attributeDescriptions = Model::Vertex::getAttributeDescriptions();
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputInfo.vertexBindingDescriptionCount = 0;
-        vertexInputInfo.pVertexBindingDescriptions = nullptr;  // Optional
-        vertexInputInfo.vertexAttributeDescriptionCount = 0;
-        vertexInputInfo.pVertexAttributeDescriptions = nullptr;  // Optional
+        vertexInputInfo.vertexAttributeDescriptionCount =
+            static_cast<uint32_t>(attributeDescriptions.size());
+        vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+        vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+        vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 
         // create a new viewPortInfo for this new pipeline
         VkPipelineViewportStateCreateInfo viewportInfo{};
@@ -111,7 +116,7 @@ namespace engine
                 device.device(),
                 VK_NULL_HANDLE,
                 1,
-                &pipelineInfo,
+                &pipelineInfo, // pCreateInfos
                 nullptr,
                 &graphicsPipeline) != VK_SUCCESS) {
             throw std::runtime_error("failed to create graphics pipeline!");

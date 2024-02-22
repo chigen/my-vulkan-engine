@@ -2,6 +2,7 @@
 
 namespace engine {
     TestApp::TestApp() {
+        loadModel();
         createPipelineLayout();
         createPipeline();
         createCommandBuffers();
@@ -19,6 +20,16 @@ namespace engine {
         }
         // wait for the device (gpu) to finish before cleaning up
         vkDeviceWaitIdle(device.device());
+    }
+
+    void TestApp::loadModel() {
+        // create a model with a triangle
+        std::vector<Model::Vertex> vertices = {
+            {{0.0f, -0.8f}},
+            {{0.5f, 0.5f}},
+            {{-0.5f, 0.5f}}
+        };
+        model = std::make_unique<Model>(device, vertices);
     }
 
     void TestApp::createPipelineLayout() {
@@ -97,9 +108,15 @@ namespace engine {
 
             // begin the render pass
             vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+            /* 
+            Note: to manage multiple pipelines' vertex buffer and other resources,
+            bind the pipelines one by one
+             */
             // bind the pipeline
             pipeline->bind(commandBuffers[i]);
-            vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+            model->bind(commandBuffers[i]);
+            model->draw(commandBuffers[i]);
             // end the render pass
             vkCmdEndRenderPass(commandBuffers[i]);
             if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
