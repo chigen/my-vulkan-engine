@@ -70,11 +70,16 @@ namespace engine {
 
     std::vector<VkVertexInputAttributeDescription> Model::Vertex::getAttributeDescriptions(){
         // binding 0, location 0, format R32G32_SFLOAT, offset 0
-        std::vector<VkVertexInputAttributeDescription> positionAttributeDescription(1);
+        std::vector<VkVertexInputAttributeDescription> positionAttributeDescription(2);
         positionAttributeDescription[0].binding = 0;
         positionAttributeDescription[0].location = 0;
         positionAttributeDescription[0].format = VK_FORMAT_R32G32_SFLOAT;
-        positionAttributeDescription[0].offset = 0;
+        positionAttributeDescription[0].offset = offsetof(Vertex, position);
+        // binding 0, location 1, format R32G32B32_SFLOAT
+        positionAttributeDescription[1].binding = 0;
+        positionAttributeDescription[1].location = 1;
+        positionAttributeDescription[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+        positionAttributeDescription[1].offset = offsetof(Vertex, color);
         return {positionAttributeDescription};
     }
 }
