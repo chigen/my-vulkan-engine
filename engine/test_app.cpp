@@ -1,6 +1,17 @@
 #include "test_app.hpp"
 
+// libs
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+
 namespace engine {
+    struct SimplePushConstantData {
+        glm::vec2 offset;
+        // align the size of the push constant to 16 bytes
+        alignas(16) glm::vec3 color;
+    };
+
     TestApp::TestApp() {
         loadModel();
         createPipelineLayout();
@@ -33,14 +44,19 @@ namespace engine {
     }
 
     void TestApp::createPipelineLayout() {
-        // create a default pipeline layout
+        // implement the push constant
+        VkPushConstantRange pushConstantRange{};
+        pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+        pushConstantRange.offset = 0;
+        pushConstantRange.size = sizeof(SimplePushConstantData);
+
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         // not using any shader stages
         pipelineLayoutInfo.setLayoutCount = 0; 
         pipelineLayoutInfo.pSetLayouts = nullptr; 
-        pipelineLayoutInfo.pushConstantRangeCount = 0; 
-        pipelineLayoutInfo.pPushConstantRanges = nullptr; 
+        pipelineLayoutInfo.pushConstantRangeCount = 1; 
+        pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange; 
 
         if (vkCreatePipelineLayout(device.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create pipeline layout");
@@ -118,6 +134,10 @@ namespace engine {
     }
 
     void TestApp::recordCommandBuffer(int imageIndex){
+        // make a simple animation
+        static int frame = 0;
+        frame = (frame + 1) % 100;
+
         // record the command buffers
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -162,7 +182,24 @@ namespace engine {
         // bind the pipeline
         pipeline->bind(commandBuffers[imageIndex]);
         model->bind(commandBuffers[imageIndex]);
-        model->draw(commandBuffers[imageIndex]);
+        
+        // push constant
+        for (int i=0; i<3; ++i){
+            SimplePushConstantData push{};
+            push.offset = {-0.5f + frame * 0.02f, -0.5f + i * 0.25f};
+            push.color = {0.0f, 0.0f, 0.1f + 0.3f * i};
+
+            vkCmdPushConstants(
+                commandBuffers[imageIndex],
+                pipelineLayout,
+                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                0,
+                sizeof(SimplePushConstantData),
+                &push
+            );
+            model->draw(commandBuffers[imageIndex]);
+        }
+
         // end the render pass
         vkCmdEndRenderPass(commandBuffers[imageIndex]);
         if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS) {

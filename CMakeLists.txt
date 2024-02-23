@@ -29,6 +29,24 @@ add_executable(ZZYEngine main.cpp)
 target_include_directories(ZZYEngine PRIVATE ${Vulkan_INCLUDE_DIRS} )
 target_link_libraries(ZZYEngine PRIVATE glfw Vulkan::Vulkan engine)
 
+# find all .vert & .frag files
+file(GLOB_RECURSE GLSL_SOURCE_FILES
+     "${CMAKE_SOURCE_DIR}/shader/*.frag"
+     "${CMAKE_SOURCE_DIR}/shader/*.vert")
+
+foreach(GLSL ${GLSL_SOURCE_FILES})
+  get_filename_component(FILE_NAME ${GLSL} NAME)
+  set(SPIRV "${CMAKE_SOURCE_DIR}/shader/${FILE_NAME}.spv")
+  add_custom_command(
+    OUTPUT ${SPIRV}
+    COMMAND ${Vulkan_GLSLC_EXECUTABLE} ${GLSL} -o ${SPIRV}
+    DEPENDS ${GLSL})
+  list(APPEND SPIRV_BINARY_FILES ${SPIRV})
+endforeach(GLSL)
+
+add_custom_target(Shaders DEPENDS ${SPIRV_BINARY_FILES})
+add_dependencies(ZZYEngine Shaders)
+
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                    ${CMAKE_SOURCE_DIR}/shader $<TARGET_FILE_DIR:${PROJECT_NAME}>/shader)
