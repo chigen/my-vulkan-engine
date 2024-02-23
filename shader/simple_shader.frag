@@ -5,7 +5,7 @@ layout(location = 0) out vec4 outColor;
 
 // for push constant
 layout(push_constant) uniform Push{
-    vec2 offset;
+    mat3 transform;
     vec3 color;
 } push;
 
