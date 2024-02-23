@@ -3,12 +3,13 @@
 namespace engine{
     SwapChain::SwapChain(Device& deviceRef, VkExtent2D windowExtent)
         : device(deviceRef), windowExtent(windowExtent){
-        createSwapChain();
-        createImageViews();
-        createDepthResources();
-        createRenderPass();
-        createFramebuffers();
-        createSyncObjects();
+        init();
+    }
+
+    SwapChain::SwapChain(Device& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previous)
+        : device(deviceRef), windowExtent(windowExtent), oldSwapChain(previous){
+        init();
+        oldSwapChain = nullptr;
     }
 
     SwapChain::~SwapChain(){
@@ -48,6 +49,15 @@ namespace engine{
         }
     }
 
+    void SwapChain::init(){
+        createSwapChain();
+        createImageViews();
+        createDepthResources();
+        createRenderPass();
+        createFramebuffers();
+        createSyncObjects();
+    }
+    
     VkSurfaceFormatKHR SwapChain::chooseSurfaceFormat(
         const std::vector<VkSurfaceFormatKHR>& availableFormats){
         for (const auto& availableFormat : availableFormats) {
@@ -141,7 +151,7 @@ namespace engine{
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
 
-        createInfo.oldSwapchain = VK_NULL_HANDLE;
+        createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapChain;
 
         if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
             throw std::runtime_error("failed to create swap chain!");
@@ -352,6 +362,8 @@ namespace engine{
             VK_TRUE,
             std::numeric_limits<uint64_t>::max());
 
+        // imageIndex is a pointer to the index of the next image to use
+        // aka commadBuffer[i]
         VkResult result = vkAcquireNextImageKHR(
             device.device(),
             swapChain,

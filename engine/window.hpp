@@ -9,8 +9,7 @@
 namespace engine {
     class Window {
         public:
-            Window(int w, int h, const std::string& name) 
-                : width(w), height(h), windowName(name) { initWindow(); }
+            Window(int w, int h, const std::string& name);
             ~Window();
 
             // delete copy constructor and operator to avoid copying the window
@@ -26,14 +25,21 @@ namespace engine {
                 return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
             }
 
+            bool wasResized() { return frameBufferResized;}
+            void resetResizedFlag() { frameBufferResized = false; }
+
             void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
         private:
             void initWindow();
 
+            static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+
             GLFWwindow* window;
             std::string windowName;
-            const int width;
-            const int height;
+            int width;
+            int height;
+
+            bool frameBufferResized = false;
     };
 }

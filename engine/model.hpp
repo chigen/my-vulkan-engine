@@ -22,7 +22,7 @@ namespace engine{
 
             // delete copy constructor and operator to avoid copying the model
             Model(const Model&) = delete;
-            void operator=(const Model&) = delete;
+            Model& operator=(const Model&) = delete;
             
             void bind(VkCommandBuffer commandBuffer);
             void draw(VkCommandBuffer commandBuffer);

@@ -23,15 +23,20 @@ namespace engine
         PipelineConfigInfo(const PipelineConfigInfo&) = delete;
         PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
 
-        VkViewport viewport;
-        VkRect2D scissor;
-        // VkPipelineViewportStateCreateInfo viewportInfo;
+
+        VkPipelineViewportStateCreateInfo viewportInfo;
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
         VkPipelineRasterizationStateCreateInfo rasterizationInfo;
         VkPipelineMultisampleStateCreateInfo multisampleInfo;
         VkPipelineColorBlendAttachmentState colorBlendAttachment;
         VkPipelineColorBlendStateCreateInfo colorBlendInfo;
         VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+        /* 
+        use dynamic viewport to allow pipeline no longer
+        depend on the swap chain extent
+         */
+        std::vector<VkDynamicState> dynamicStateEnables;
+        VkPipelineDynamicStateCreateInfo dynamicStateInfo;
         // Pipeline layout will be created in app launcher separately
         VkPipelineLayout pipelineLayout = nullptr;
         VkRenderPass renderPass = nullptr;
@@ -49,12 +54,12 @@ namespace engine
 
             // delete copy constructor and operator to avoid copying the pipeline
             Pipeline(const Pipeline&) = delete;
-            void operator=(const Pipeline&) = delete;
+            Pipeline& operator=(const Pipeline&) = delete;
 
             void bind(VkCommandBuffer commandBuffer);
 
             static void defaultPipelineConfigInfo(
-                PipelineConfigInfo& configinfo, uint32_t width, uint32_t height);
+                PipelineConfigInfo& configinfo);
 
         private:
             static std::vector<char> readFile (const std::string& filename);
