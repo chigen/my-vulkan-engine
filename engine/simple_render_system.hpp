@@ -31,11 +31,9 @@
     those pipelines execute different shader code.
 */
 
-#include "window.hpp"
+#include "pipeline.hpp"
 #include "device.hpp"
 #include "game_object.hpp"
-#include "simple_render_system.hpp"
-#include "renderer.hpp"
 
 #include <memory>
 #include <vector>
@@ -43,25 +41,22 @@
 #include <stdexcept>
 
 namespace engine {
-    class TestApp {
+    class SimpleRenderSystem {
         public:
-            static constexpr int WIDTH = 800;
-            static constexpr int HEIGHT = 600;
+            SimpleRenderSystem(Device &device, VkRenderPass renderPass);
+            ~SimpleRenderSystem();
+            // delete copy constructor and operator to avoid copying the renderer
+            SimpleRenderSystem(const SimpleRenderSystem&) = delete;
+            SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
 
-            TestApp();
-            ~TestApp();
-
-            TestApp(const TestApp&) = delete;
-            TestApp& operator=(const TestApp&) = delete;
-
-            void run();
-
+            void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects);
         private:
-            void loadGameObjects();
+            void createPipelineLayout();
+            void createPipeline(VkRenderPass renderPass);
 
-            Window window{WIDTH, HEIGHT, "Test App"};
-            Device device{window};
-            Renderer renderer{device, window};
-            std::vector<GameObject> gameObjects;
+            // device is initialized in app launcher
+            Device& device;
+            std::unique_ptr<Pipeline> pipeline;
+            VkPipelineLayout pipelineLayout;
     };
 }
