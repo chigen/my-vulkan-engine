@@ -19,10 +19,20 @@ namespace engine{
                 float fovy, float aspect, float near, float far
             );
 
+            void setViewDirection(const glm::vec3 position, const glm::vec3 direction, 
+                const glm::vec3 up = glm::vec3{0.f, -1.f, 0.f});
+
+            void setViewTarget(const glm::vec3 position, const glm::vec3 target, 
+                const glm::vec3 up = glm::vec3{0.f, -1.f, 0.f});
+
+            void setViewYXZ(const glm::vec3 position, const glm::vec3 rotation);
+
             const glm::mat4& getProjection() const { return projection; }
+            const glm::mat4& getView() const { return view; }
 
         private:
             glm::mat4 projection{1.f};
+            glm::mat4 view{1.f};
     };
     
 } // namespace engin

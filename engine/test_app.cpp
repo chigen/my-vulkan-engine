@@ -30,6 +30,9 @@ namespace engine {
         // also update the current frame in flight
         SimpleRenderSystem simpleRenderSystem(device, renderer.getSwapChainRenderPass());
         Camera camera{};
+        camera.setViewDirection(glm::vec3{0.f}, glm::vec3{0.f, 0.5f, 1.f});
+        // camera.setViewTarget(glm::vec3{1.f, 2.f, 1.f}, glm::vec3{0.f, 0.5f, 0.f});
+        // camera.setViewYXZ(glm::vec3{0.f, 0.f, 2.f}, glm::vec3{0.f, glm::pi<float>(), 0.f});
 
         while (!window.shouldClose()) {
             glfwPollEvents();
