@@ -10,8 +10,8 @@ namespace engine{
         public:
             struct Vertex
             {
-                glm::vec3 position;
-                glm::vec3 color;
+                glm::vec3 position{};
+                glm::vec3 color{};
                 // binding description
                 static std::vector<VkVertexInputBindingDescription> getBindingDescription();
                 // attribute descriptions

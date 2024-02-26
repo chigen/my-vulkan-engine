@@ -43,9 +43,77 @@ namespace engine {
         vkDeviceWaitIdle(device.device());
     }
 
+    // temporary helper function, creates a 1x1x1 cube centered at offset
+    std::unique_ptr<Model> createCubeModel(Device& device, glm::vec3 offset) {
+        std::vector<Model::Vertex> vertices{
+
+            // left face (white)
+            {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+            {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+            {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+            {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+            {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
+            {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+
+            // right face (yellow)
+            {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+            {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+            {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+            {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+            {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
+            {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+
+            // top face (orange, remember y axis points down)
+            {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+            {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+            {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+            {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+            {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+            {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+
+            // bottom face (red)
+            {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+            {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+            {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+            {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+            {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+            {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+
+            // nose face (blue)
+            {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+            {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+            {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+            {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+            {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+            {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+
+            // tail face (green)
+            {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+            {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+            {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+            {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+            {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+            {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+
+        };
+        for (auto& v : vertices) {
+            v.position += offset;
+        }
+        return std::make_unique<Model>(device, vertices);
+    }
+
     void TestApp::loadGameObjects() {
+        // create a model with a cube
+        std::shared_ptr<Model> cubeModel = createCubeModel(device, {0.0f, 0.0f, 0.0f});
+        auto cube = GameObject::createGameObject();
+        cube.model = cubeModel;
+        // scale and move the cube into available space
+        cube.transform3d.translation = {0.0f, 0.0f, 0.5f};
+        cube.transform3d.scale = {0.5f, 0.5f, 0.5f};
+        gameObjects.push_back(std::move(cube));
+
         // create a model with a triangle
-        std::vector<Model::Vertex> vertices = {
+        /* std::vector<Model::Vertex> vertices = {
             {{0.0f, -0.5f, 1.0f}, {1.0f, 0.0f, 0.0f}},
             {{0.5f, 0.5f, 1.0f}, {0.0f, 1.0f, 0.0f}},
             {{-0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 1.0f}}
@@ -59,6 +127,6 @@ namespace engine {
         triangle.transform2d.scale = {1.2f, 0.5f};
         triangle.transform2d.rotation = 0.25f * glm::two_pi<float>();
 
-        gameObjects.push_back(std::move(triangle));
+        gameObjects.push_back(std::move(triangle)); */
     }
 }

@@ -8,7 +8,7 @@
 
 namespace engine {
     struct SimplePushConstantData {
-        glm::mat3 transform;
+        glm::mat4 transform{1.f};
         // align the size of the push constant to 16 bytes
         alignas(16) glm::vec3 color;
     };
@@ -66,9 +66,10 @@ namespace engine {
         // bind the pipeline
         pipeline->bind(commandBuffer);
         for (auto& obj : gameObjects) {
-            obj.transform2d.rotation = glm::mod(obj.transform2d.rotation + 0.01f, glm::two_pi<float>());
+            obj.transform3d.rotation.x  = glm::mod(obj.transform3d.rotation.x + 0.01f, glm::two_pi<float>());
+            obj.transform3d.rotation.y  = glm::mod(obj.transform3d.rotation.y + 0.005f, glm::two_pi<float>());
             SimplePushConstantData push{};
-            push.transform = obj.transform2d.mat3();
+            push.transform = obj.transform3d.mat4();
             push.color = obj.color;
             // push constant
             vkCmdPushConstants(
