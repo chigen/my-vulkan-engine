@@ -29,12 +29,16 @@ namespace engine {
         // (in SwapChain::submitCommandBuffers)
         // also update the current frame in flight
         SimpleRenderSystem simpleRenderSystem(device, renderer.getSwapChainRenderPass());
+        Camera camera{};
+
         while (!window.shouldClose()) {
             glfwPollEvents();
-
+            float aspect = renderer.getAspectRatio();
+            // camera.setOrthographicProjection(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+            camera.setPerspectiveProjection(glm::radians(100.0f), aspect, 0.1f, 10.0f);
             if (auto commandBuffer = renderer.beginFrame()) {
                 renderer.beginSwapChainRenderPass(commandBuffer);
-                simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects);
+                simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
                 renderer.endSwapChainRenderPass(commandBuffer);
                 renderer.endFrame();
             }
@@ -108,7 +112,7 @@ namespace engine {
         auto cube = GameObject::createGameObject();
         cube.model = cubeModel;
         // scale and move the cube into available space
-        cube.transform3d.translation = {0.0f, 0.0f, 0.5f};
+        cube.transform3d.translation = {0.0f, 0.0f, 1.5f};
         cube.transform3d.scale = {0.5f, 0.5f, 0.5f};
         gameObjects.push_back(std::move(cube));
 
