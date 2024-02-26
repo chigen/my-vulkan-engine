@@ -30,6 +30,8 @@ namespace engine {
 
             void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
+            GLFWwindow* getGLFWwindow() { return window; }
+
         private:
             void initWindow();
 

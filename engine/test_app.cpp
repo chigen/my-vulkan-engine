@@ -1,10 +1,13 @@
 #include "test_app.hpp"
+#include "keyboard_controller.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+
+#include <chrono>
 
 namespace engine {
     struct SimplePushConstantData {
@@ -30,12 +33,23 @@ namespace engine {
         // also update the current frame in flight
         SimpleRenderSystem simpleRenderSystem(device, renderer.getSwapChainRenderPass());
         Camera camera{};
-        camera.setViewDirection(glm::vec3{0.f}, glm::vec3{0.f, 0.5f, 1.f});
-        // camera.setViewTarget(glm::vec3{1.f, 2.f, 1.f}, glm::vec3{0.f, 0.5f, 0.f});
-        // camera.setViewYXZ(glm::vec3{0.f, 0.f, 2.f}, glm::vec3{0.f, glm::pi<float>(), 0.f});
+
+        // create a camera viewer object
+        auto cameraObject = GameObject::createGameObject();
+        KeyboardController cameraController{};
+
+        auto currentTime = std::chrono::high_resolution_clock::now();
 
         while (!window.shouldClose()) {
             glfwPollEvents();
+
+            auto newTime = std::chrono::high_resolution_clock::now();
+            float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            currentTime = newTime;
+
+            cameraController.moveInXZPlane(window.getGLFWwindow(), frameTime, cameraObject);
+            camera.setViewYXZ(cameraObject.transform3d.translation, cameraObject.transform3d.rotation);
+
             float aspect = renderer.getAspectRatio();
             // camera.setOrthographicProjection(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
             camera.setPerspectiveProjection(glm::radians(100.0f), aspect, 0.1f, 10.0f);
