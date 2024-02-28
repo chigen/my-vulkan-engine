@@ -252,17 +252,25 @@ namespace engine {
     }
 
     std::vector<VkVertexInputAttributeDescription> Model::Vertex::getAttributeDescriptions(){
-        // binding 0, location 0, format R32G32_SFLOAT, offset 0
-        std::vector<VkVertexInputAttributeDescription> positionAttributeDescription(2);
-        positionAttributeDescription[0].binding = 0;
-        positionAttributeDescription[0].location = 0;
-        positionAttributeDescription[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-        positionAttributeDescription[0].offset = offsetof(Vertex, position);
-        // binding 0, location 1, format R32G32B32_SFLOAT
-        positionAttributeDescription[1].binding = 0;
-        positionAttributeDescription[1].location = 1;
-        positionAttributeDescription[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        positionAttributeDescription[1].offset = offsetof(Vertex, color);
-        return {positionAttributeDescription};
+        
+        std::vector<VkVertexInputAttributeDescription> positionAttributeDescription{};
+        // // binding 0, location 0, format R32G32_SFLOAT, offset 0
+        // positionAttributeDescription[0].binding = 0;
+        // positionAttributeDescription[0].location = 0;
+        // positionAttributeDescription[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+        // positionAttributeDescription[0].offset = offsetof(Vertex, position);
+        positionAttributeDescription.push_back({
+            0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)
+        });
+        positionAttributeDescription.push_back({
+            1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color)
+        });
+        positionAttributeDescription.push_back({
+            2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal)
+        });
+        positionAttributeDescription.push_back({
+            3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)
+        });
+        return positionAttributeDescription;
     }
 }

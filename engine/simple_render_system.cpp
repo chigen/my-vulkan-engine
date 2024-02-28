@@ -9,8 +9,7 @@
 namespace engine {
     struct SimplePushConstantData {
         glm::mat4 transform{1.f};
-        // align the size of the push constant to 16 bytes
-        alignas(16) glm::vec3 color;
+        glm::mat4 normalMatrix{1.f};
     };
 
     SimpleRenderSystem::SimpleRenderSystem(Device &device, VkRenderPass renderPass)
@@ -69,12 +68,15 @@ namespace engine {
         pipeline->bind(commandBuffer);
         // projection matrix * view(camera) matrix
         auto projectionView = camera.getProjection() * camera.getView();
+
         for (auto& obj : gameObjects) {
-            obj.transform3d.rotation.x  = glm::mod(obj.transform3d.rotation.x + 0.01f, glm::two_pi<float>());
-            obj.transform3d.rotation.y  = glm::mod(obj.transform3d.rotation.y + 0.005f, glm::two_pi<float>());
+            // object rotation
+            // obj.transform3d.rotation.x  = glm::mod(obj.transform3d.rotation.x + 0.01f, glm::two_pi<float>());
+            // obj.transform3d.rotation.y  = glm::mod(obj.transform3d.rotation.y + 0.005f, glm::two_pi<float>());
             SimplePushConstantData push{};
-            push.transform = projectionView * obj.transform3d.mat4();
-            push.color = obj.color;
+            auto modelMatrix = obj.transform3d.mat4();
+            push.transform = projectionView * modelMatrix;
+            push.normalMatrix = obj.transform3d.normalMatrix();
             // push constant
             vkCmdPushConstants(
                 commandBuffer,

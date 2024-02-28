@@ -3,10 +3,12 @@
 layout(location = 0) in vec3 fragColor;
 layout(location = 0) out vec4 outColor;
 
-// for push constant
+// push constant only support 128 bytes => 32 floats => 2 mat4
 layout(push_constant) uniform Push{
-    mat4 transform;
-    vec3 color;
+    mat4 transform; // projection * view * model
+    // for using case 3 below, use normal matrix instead
+    // mat4 modelMatrix;
+    mat4 normalMatrix;
 } push;
 
 void main() {
