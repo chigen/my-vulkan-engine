@@ -115,14 +115,22 @@ namespace engine {
     }
     
     void TestApp::loadGameObjects() {
-        // create a model with a cube
-        std::shared_ptr<Model> cubeModel = createCubeModel(device, {0.0f, 0.0f, 0.0f});
+        // create a model using .obj file
+        std::shared_ptr<Model> model = Model::createModelFromFile(device, "../assets/models/room.obj");
+        auto gameObj = GameObject::createGameObject();
+        gameObj.model = model;
+        gameObj.transform3d.translation = {0.0f, 0.0f, 2.0f};
+        gameObj.transform3d.scale = glm::vec3(1.f);
+        gameObjects.push_back(std::move(gameObj));
+
+        // create a model hard-coded with a cube
+        /* std::shared_ptr<Model> cubeModel = createCubeModel(device, {0.0f, 0.0f, 0.0f});
         auto cube = GameObject::createGameObject();
         cube.model = cubeModel;
         // scale and move the cube into available space
         cube.transform3d.translation = {0.0f, 0.0f, 1.5f};
         cube.transform3d.scale = {0.5f, 0.5f, 0.5f};
-        gameObjects.push_back(std::move(cube));
+        gameObjects.push_back(std::move(cube)); */
 
         // create a model with a triangle
         /* std::vector<Model::Vertex> vertices = {

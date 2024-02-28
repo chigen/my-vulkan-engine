@@ -7,6 +7,9 @@ project(ZZYEngine VERSION 0.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Set the directory where the tinyobjloader library is located
+set(TINY_OBJ_LOADER_DIR ${PROJECT_SOURCE_DIR}/3rd/tinyobjloader-master)
+
 # Find packages
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
@@ -20,16 +23,27 @@ if(Vulkan_FOUND)
     message(STATUS "Vulkan found")
 endif()
 
+# Include the tinyobjloader directory
+include_directories(${TINY_OBJ_LOADER_DIR})
+
+# Add tinyobjloader library
+add_library(tinyobjloader STATIC
+    ${TINY_OBJ_LOADER_DIR}/tiny_obj_loader.cc
+)
+target_include_directories(tinyobjloader PUBLIC ${TINY_OBJ_LOADER_DIR})
+
 # Include the engine directory
 add_subdirectory(engine)
 
 add_executable(ZZYEngine main.cpp)
 
-# It's better to use target_include_directories and target_link_libraries on a target basis
-target_include_directories(ZZYEngine PRIVATE ${Vulkan_INCLUDE_DIRS} )
-target_link_libraries(ZZYEngine PRIVATE glfw Vulkan::Vulkan engine)
+# Specify include directories
+target_include_directories(ZZYEngine PRIVATE ${Vulkan_INCLUDE_DIRS})
 
-# find all .vert & .frag files
+# Link libraries
+target_link_libraries(ZZYEngine PRIVATE glfw Vulkan::Vulkan engine tinyobjloader)
+
+# Find all .vert & .frag files
 file(GLOB_RECURSE GLSL_SOURCE_FILES
      "${CMAKE_SOURCE_DIR}/shader/*.frag"
      "${CMAKE_SOURCE_DIR}/shader/*.vert")

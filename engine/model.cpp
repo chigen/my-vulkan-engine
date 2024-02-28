@@ -1,8 +1,88 @@
 #include "model.hpp"
+#include "utils.hpp"
+
+#include <tiny_obj_loader.h>
+// GLM_GTX is an experimental extension
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 
 #include <cassert>
+#include <unordered_map>
+#include <iostream>
+
+namespace std{
+    // create hash value for Vertex struct
+    template<> struct hash<engine::Model::Vertex>{
+        size_t operator()(engine::Model::Vertex const& vertex) const{
+            size_t seed = 0;
+            engine::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+            return seed;
+        }
+    };
+
+}
 
 namespace engine {
+    void Model::Builder::loadModel(const std::string& filePath){
+        /* 
+        This function will call the tinyobjloader to load the .obj model from the file path
+         */
+        tinyobj::attrib_t attrib;
+        std::vector<tinyobj::shape_t> shapes;
+        std::vector<tinyobj::material_t> materials;
+        std::string warn;
+        std::string err;
+
+        if(!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filePath.c_str())){
+            throw std::runtime_error(warn + err);
+        }
+
+        std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+        for(const auto& shape: shapes){
+            for(const auto& index : shape.mesh.indices){
+                Vertex vertex{};
+                if(index.vertex_index >= 0){
+                    vertex.position = {
+                        attrib.vertices[3 * index.vertex_index + 0],
+                        attrib.vertices[3 * index.vertex_index + 1],
+                        attrib.vertices[3 * index.vertex_index + 2]
+                    };
+
+                    vertex.color = {
+                        attrib.colors[3 * index.vertex_index + 0],
+                        attrib.colors[3 * index.vertex_index + 1],
+                        attrib.colors[3 * index.vertex_index + 2]
+                    };
+                }
+
+                if(index.normal_index >= 0){
+                    vertex.normal = {
+                        attrib.normals[3 * index.normal_index + 0],
+                        attrib.normals[3 * index.normal_index + 1],
+                        attrib.normals[3 * index.normal_index + 2]
+                    };
+                }
+
+                if(index.texcoord_index >= 0){
+                    vertex.uv = {
+                        attrib.texcoords[2 * index.texcoord_index + 0],
+                        attrib.texcoords[2 * index.texcoord_index + 1],
+                    };
+                }
+
+                // check if the vertex is new => if it's in the uniqueVertices map
+                // if it's new, add it to the uniqueVertices map and the vertices vector to record its index
+                if(uniqueVertices.count(vertex) == 0){
+                    uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+                    vertices.push_back(vertex);
+                }
+                indices.push_back(uniqueVertices[vertex]);
+            }
+
+        }
+    }
+    
+
     Model::Model(Device& device, const Builder& builder) : device{device} {
         createVertexBuffers(builder.vertices);
         createIndexBuffers(builder.indices);
@@ -16,6 +96,16 @@ namespace engine {
             vkDestroyBuffer(device.device(), indexBuffer, nullptr);
             vkFreeMemory(device.device(), indexBufferMemory, nullptr);
         }
+    }
+
+    std::unique_ptr<Model> Model::createModelFromFile(Device& device, const std::string& filePath){
+        // initialize the Model instance with the builder, using unique_ptr
+        Model::Builder builder{};
+        builder.loadModel(filePath);
+        
+        std::cout<< "vertices size: " << builder.vertices.size() << std::endl;
+        
+        return std::make_unique<Model>(device, builder);
     }
 
     void Model::createVertexBuffers(const std::vector<Vertex>& vertices){
