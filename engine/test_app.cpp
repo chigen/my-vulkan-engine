@@ -1,5 +1,6 @@
 #include "test_app.hpp"
 #include "keyboard_controller.hpp"
+#include "buffer.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -10,10 +11,9 @@
 #include <chrono>
 
 namespace engine {
-    struct SimplePushConstantData {
-        glm::mat3 transform;
-        // align the size of the push constant to 16 bytes
-        alignas(16) glm::vec3 color;
+    struct GlobalUbo {
+        glm::mat4 projectView{1.f};
+        glm::vec3 lightDirection = glm::normalize(glm::vec3(1.f, -3.f, -1.f));
     };
 
     TestApp::TestApp() {
@@ -23,6 +23,18 @@ namespace engine {
     TestApp::~TestApp() { }
 
     void TestApp::run() {
+        std::vector<std::unique_ptr<Buffer>> uniformBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i=0; i<uniformBuffers.size(); ++i){
+            uniformBuffers[i] = std::make_unique<Buffer>(
+                device,
+                sizeof(GlobalUbo),
+                1,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+            );
+            uniformBuffers[i]->map();
+        }
+
         // draw frame procedure:
         // 1. Acquire an image from the swap chain, calling vkAcquireNextImageKHR
         // (in SwapChain::acquireNextImage)
@@ -55,8 +67,17 @@ namespace engine {
             camera.setPerspectiveProjection(glm::radians(100.0f), aspect, 0.1f, 10.0f);
 
             if (auto commandBuffer = renderer.beginFrame()) {
+                int frameIndex = renderer.getFrameIndex();
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera};
+
+                // update
+                GlobalUbo ubo{};
+                ubo.projectView = camera.getProjection() * camera.getView();
+                uniformBuffers[frameIndex]->writeToBuffer(&ubo);
+                uniformBuffers[frameIndex]->flush();
+
                 renderer.beginSwapChainRenderPass(commandBuffer);
-                simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
+                simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
                 renderer.endSwapChainRenderPass(commandBuffer);
                 renderer.endFrame();
             }

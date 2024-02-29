@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#include "buffer.hpp"
 #include "device.hpp"
 
 namespace engine{
@@ -50,13 +51,13 @@ namespace engine{
             void createIndexBuffers(const std::vector<uint32_t>& indices);
 
             Device& device;
-            VkBuffer vertexBuffer;
-            VkDeviceMemory vertexBufferMemory;
+            
+            std::unique_ptr<Buffer> vertexBuffer;
             uint32_t vertexCount;
 
             bool hasIndexBuffer = false;
-            VkBuffer indexBuffer;
-            VkDeviceMemory indexBufferMemory;
+            
+            std::unique_ptr<Buffer> indexBuffer;
             uint32_t indexCount;
     };
 }

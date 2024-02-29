@@ -35,6 +35,7 @@
 #include "device.hpp"
 #include "game_object.hpp"
 #include "camera.hpp"
+#include "frame_info.hpp"
 
 #include <memory>
 #include <vector>
@@ -50,9 +51,8 @@ namespace engine {
             SimpleRenderSystem(const SimpleRenderSystem&) = delete;
             SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
 
-            void renderGameObjects(VkCommandBuffer commandBuffer, 
-                std::vector<GameObject>& gameObjects,
-                const Camera& camera);
+            void renderGameObjects(FrameInfo& frameInfo, 
+                std::vector<GameObject>& gameObjects);
         private:
             void createPipelineLayout();
             void createPipeline(VkRenderPass renderPass);
