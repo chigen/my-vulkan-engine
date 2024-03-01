@@ -13,7 +13,15 @@
 namespace engine {
     struct GlobalUbo {
         glm::mat4 projectView{1.f};
-        glm::vec3 lightDirection = glm::normalize(glm::vec3(1.f, -3.f, -1.f));
+        // this lightDirection is for parrallel light
+        // glm::vec3 lightDirection = glm::normalize(glm::vec3(1.f, -3.f, -1.f));
+
+        // for point light:
+        // ambient light, w is its intensity
+        glm::vec4 ambientLight{1.f, 1.f, 1.f, 0.02f};
+        glm::vec3 lightPosition{-1.f};
+        // r, g, b, intensity
+        alignas(16) glm::vec4 lightColor{0.5f, 1.f, 0.5f, 1.f};
     };
 
     TestApp::TestApp() {
@@ -80,6 +88,7 @@ namespace engine {
 
         // create a camera viewer object
         auto cameraObject = GameObject::createGameObject();
+        cameraObject.transform3d.translation.z = -2.5f;
         KeyboardController cameraController{};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -96,7 +105,7 @@ namespace engine {
 
             float aspect = renderer.getAspectRatio();
             // camera.setOrthographicProjection(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
-            camera.setPerspectiveProjection(glm::radians(100.0f), aspect, 0.1f, 10.0f);
+            camera.setPerspectiveProjection(glm::radians(100.0f), aspect, 0.1f, 100.0f);
 
             if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
@@ -173,7 +182,7 @@ namespace engine {
         std::shared_ptr<Model> model = Model::createModelFromFile(device, "../assets/models/room.obj");
         auto gameObj = GameObject::createGameObject();
         gameObj.model = model;
-        gameObj.transform3d.translation = {-0.5f, 0.5f, 2.0f};
+        gameObj.transform3d.translation = {-0.5f, 0.5f, 0.0f};
         gameObj.transform3d.scale = glm::vec3(1.f);
         gameObj.transform3d.rotation = glm::vec3(glm::radians(90.0f), glm::radians(90.0f), 0.f);
         gameObjects.push_back(std::move(gameObj));
@@ -181,16 +190,23 @@ namespace engine {
         std::shared_ptr<Model> flat_vase_model = Model::createModelFromFile(device, "../assets/models/flat_vase.obj");
         auto flat_vase = GameObject::createGameObject();
         flat_vase.model = flat_vase_model;
-        flat_vase.transform3d.translation = {1.0f, 0.5f, 2.0f};
+        flat_vase.transform3d.translation = {1.0f, 0.5f, 0.0f};
         flat_vase.transform3d.scale = glm::vec3(3.f);
         gameObjects.push_back(std::move(flat_vase));
 
         std::shared_ptr<Model> smooth_vase_model = Model::createModelFromFile(device, "../assets/models/smooth_vase.obj");
         auto smooth_vase = GameObject::createGameObject();
         smooth_vase.model = smooth_vase_model;
-        smooth_vase.transform3d.translation = {2.0f, 0.5f, 2.0f};
+        smooth_vase.transform3d.translation = {2.0f, 0.5f, 0.0f};
         smooth_vase.transform3d.scale = glm::vec3(3.f);
         gameObjects.push_back(std::move(smooth_vase));
+
+        std::shared_ptr<Model> quad_model = Model::createModelFromFile(device, "../assets/models/quad.obj");
+        auto quad = GameObject::createGameObject();
+        quad.model = quad_model;
+        quad.transform3d.translation = {0.0f, 0.5f, 0.0f};
+        quad.transform3d.scale = {3.f, 1.f, 3.f};
+        gameObjects.push_back(std::move(quad));
 
         // create a model hard-coded with a cube
         /* std::shared_ptr<Model> cubeModel = createCubeModel(device, {0.0f, 0.0f, 0.0f});
