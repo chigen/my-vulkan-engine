@@ -9,6 +9,8 @@ layout(location = 2) in vec3 normal;
 layout(location = 3) in vec2 uv;
 
 layout(location = 0) out vec3 fragColor;
+layout(location = 1) out vec3 worldFragPos;
+layout(location = 2) out vec3 worldFragNormal;
 
 // for descriptor set 0 binding 0
 layout(set = 0, binding = 0) uniform GlobalUbo {
@@ -30,6 +32,7 @@ layout(push_constant) uniform Push{
     mat4 normalMatrix;
 } push;
 
+// vertex light: compute light in vert shader
 void main() {
     vec4 worldPosition = push.modelMatrix * vec4(position, 1.0);
     gl_Position = ubo.projectionViewMatrix * worldPosition;
@@ -42,14 +45,9 @@ void main() {
     // vec3 normalWorldSpace = normalize(transpose(inverse(mat3(push.modelMatrix))) * normal);
 
     // 3. pass in pre-computed normal matrix to shaders
-    vec3 normalWorldSpace = normalize(mat3(push.normalMatrix) * normal);
+    // vec3 normalWorldSpace = normalize(mat3(push.normalMatrix) * normal);
 
-    vec3 directionToLight = ubo.lightPosition - worldPosition.xyz;
-    float attenuation = 1.0 / dot(directionToLight, directionToLight);
-
-    vec3 lightColor = ubo.lightColor.xyz * ubo.lightColor.w * attenuation;
-    vec3 ambientLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
-    vec3 diffuseLight = lightColor * max(dot(normalWorldSpace, normalize(directionToLight)), 0.0);
-    
-    fragColor = (diffuseLight + ambientLight) * color;
+    worldFragPos = worldPosition.xyz;
+    worldFragNormal = normalize(mat3(push.normalMatrix) * normal);
+    fragColor = color;
 }
