@@ -17,22 +17,54 @@ namespace engine {
     };
 
     TestApp::TestApp() {
+        // create global descriptor pool
+        globalPool = DescriptorPool::Builder(device)
+            .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+            .build();
+
         loadGameObjects();
     }
 
     TestApp::~TestApp() { }
 
     void TestApp::run() {
-        std::vector<std::unique_ptr<Buffer>> uniformBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
-        for (int i=0; i<uniformBuffers.size(); ++i){
-            uniformBuffers[i] = std::make_unique<Buffer>(
+        std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i=0; i<uboBuffers.size(); ++i){
+            uboBuffers[i] = std::make_unique<Buffer>(
                 device,
                 sizeof(GlobalUbo),
                 1,
                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
             );
-            uniformBuffers[i]->map();
+            uboBuffers[i]->map();
+        }
+
+        // an example for descriptor set:
+        // bind pipeline, bind global descriptor set -  at set #0
+        // for each material in Materials:
+            // bind material descriptor set - at set #1
+
+            // for each object using this material:
+                // bind object descriptor set - at set #2
+                // draw object
+
+        // [Master render system](globalSetLayout)
+        //  |
+        //  v
+        // sub systems: [Simple render system](set 0: globalSetLayout, set 1: xxxSetLayout ...) 
+        // [xxx render system](set 0: globalSetLayout, set 1: yyyLayout ...) ...
+        auto globalSetLayout = DescriptorSetLayout::Builder(device)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+            .build();
+
+        std::vector<VkDescriptorSet> globalDescriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i=0; i<globalDescriptorSets.size(); ++i){
+            auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            DescriptorWriter(*globalSetLayout, *globalPool)
+            .writeBuffer(0, &bufferInfo)
+            .build(globalDescriptorSets[i]);
         }
 
         // draw frame procedure:
@@ -73,8 +105,8 @@ namespace engine {
                 // update
                 GlobalUbo ubo{};
                 ubo.projectView = camera.getProjection() * camera.getView();
-                uniformBuffers[frameIndex]->writeToBuffer(&ubo);
-                uniformBuffers[frameIndex]->flush();
+                uboBuffers[frameIndex]->writeToBuffer(&ubo);
+                uboBuffers[frameIndex]->flush();
 
                 renderer.beginSwapChainRenderPass(commandBuffer);
                 simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);

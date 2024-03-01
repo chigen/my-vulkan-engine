@@ -37,6 +37,7 @@
 #include "simple_render_system.hpp"
 #include "renderer.hpp"
 #include "camera.hpp"
+#include "descriptors.hpp"
 
 #include <memory>
 #include <vector>
@@ -63,6 +64,8 @@ namespace engine {
             Window window{WIDTH, HEIGHT, "Test App"};
             Device device{window};
             Renderer renderer{device, window};
+
+            std::unique_ptr<DescriptorPool> globalPool;
             std::vector<GameObject> gameObjects;
     };
 }
