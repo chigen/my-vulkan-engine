@@ -10,19 +10,24 @@ layout(location = 3) in vec2 uv;
 
 layout(location = 0) out vec3 fragColor;
 
+// for descriptor set 0 binding 0
+layout(set = 0, binding = 0) uniform GlobalUbo {
+    mat4 projectionViewMatrix;
+    vec3 directionToLight;
+} ubo;
+
 // push constant only support 128 bytes => 32 floats => 2 mat4
 layout(push_constant) uniform Push{
-    mat4 transform; // projection * view * model
+    mat4 modelMatrix; // projection * view * model
     // for using case 3 below, use normal matrix instead
     // mat4 modelMatrix;
     mat4 normalMatrix;
 } push;
 
-const vec3 lightDir = normalize(vec3(1.0, -3.0, -1.0));
 const float ambient = 0.01;
 
 void main() {
-    gl_Position = push.transform * vec4(position, 1.0);
+    gl_Position = ubo.projectionViewMatrix * push.modelMatrix * vec4(position, 1.0);
 
     // For normal transformation, 
     // 1. if we only allow uniform scaling, (vec3 scale => float scale) we can use:
@@ -34,7 +39,7 @@ void main() {
     // 3. pass in pre-computed normal matrix to shaders
     vec3 normalWorldSpace = normalize(mat3(push.normalMatrix) * normal);
 
-    float lightIntensity = max(dot(normalWorldSpace, lightDir), 0.0) + ambient;
+    float lightIntensity = max(dot(normalWorldSpace, ubo.directionToLight), 0.0) + ambient;
     
     fragColor = lightIntensity * color;
 }

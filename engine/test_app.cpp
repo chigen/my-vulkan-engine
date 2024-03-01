@@ -75,7 +75,7 @@ namespace engine {
         // 3. return the image to the swap chain for presentation, calling vkQueuePresentKHR
         // (in SwapChain::submitCommandBuffers)
         // also update the current frame in flight
-        SimpleRenderSystem simpleRenderSystem(device, renderer.getSwapChainRenderPass());
+        SimpleRenderSystem simpleRenderSystem(device, renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
         Camera camera{};
 
         // create a camera viewer object
@@ -100,7 +100,7 @@ namespace engine {
 
             if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
-                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera};
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex]};
 
                 // update
                 GlobalUbo ubo{};

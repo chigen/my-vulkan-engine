@@ -5,7 +5,7 @@ layout(location = 0) out vec4 outColor;
 
 // push constant only support 128 bytes => 32 floats => 2 mat4
 layout(push_constant) uniform Push{
-    mat4 transform; // projection * view * model
+    mat4 modelMatrix; // projection * view * model
     // for using case 3 below, use normal matrix instead
     // mat4 modelMatrix;
     mat4 normalMatrix;

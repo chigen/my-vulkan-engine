@@ -45,7 +45,7 @@
 namespace engine {
     class SimpleRenderSystem {
         public:
-            SimpleRenderSystem(Device &device, VkRenderPass renderPass);
+            SimpleRenderSystem(Device &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
             ~SimpleRenderSystem();
             // delete copy constructor and operator to avoid copying the renderer
             SimpleRenderSystem(const SimpleRenderSystem&) = delete;
@@ -54,7 +54,7 @@ namespace engine {
             void renderGameObjects(FrameInfo& frameInfo, 
                 std::vector<GameObject>& gameObjects);
         private:
-            void createPipelineLayout();
+            void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
             void createPipeline(VkRenderPass renderPass);
 
             // device is initialized in app launcher
