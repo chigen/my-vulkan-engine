@@ -63,8 +63,7 @@ namespace engine {
     }
 
 
-    void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo,
-        std::vector<GameObject>& gameObjects){
+    void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo){
         // bind the pipeline
         pipeline->bind(frameInfo.commandBuffer);
 
@@ -78,7 +77,9 @@ namespace engine {
             0,
             nullptr);
 
-        for (auto& obj : gameObjects) {
+        for (auto& kv : frameInfo.gameObjects) {
+            auto& obj = kv.second;
+            if (obj.model == nullptr) continue;
             // object rotation
             // obj.transform3d.rotation.x  = glm::mod(obj.transform3d.rotation.x + 0.01f, glm::two_pi<float>());
             // obj.transform3d.rotation.y  = glm::mod(obj.transform3d.rotation.y + 0.005f, glm::two_pi<float>());
