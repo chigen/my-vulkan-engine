@@ -14,7 +14,8 @@ layout(location = 2) out vec3 worldFragNormal;
 
 // for descriptor set 0 binding 0
 layout(set = 0, binding = 0) uniform GlobalUbo {
-    mat4 projectionViewMatrix;
+    mat4 projection;
+    mat4 view;
     // this is for parrallel light
     // vec3 directionToLight;
 
@@ -35,7 +36,7 @@ layout(push_constant) uniform Push{
 // vertex light: compute light in vert shader
 void main() {
     vec4 worldPosition = push.modelMatrix * vec4(position, 1.0);
-    gl_Position = ubo.projectionViewMatrix * worldPosition;
+    gl_Position = ubo.projection * ubo.view * worldPosition;
 
     // For normal transformation, 
     // 1. if we only allow uniform scaling, (vec3 scale => float scale) we can use:

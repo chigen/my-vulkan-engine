@@ -31,14 +31,11 @@
     those pipelines execute different shader code.
 */
 
-#include "window.hpp"
+#include "pipeline.hpp"
 #include "device.hpp"
 #include "game_object.hpp"
-#include "render_system/simple_render_system.hpp"
-#include "render_system/point_light_system.hpp"
-#include "renderer.hpp"
 #include "camera.hpp"
-#include "descriptors.hpp"
+#include "frame_info.hpp"
 
 #include <memory>
 #include <vector>
@@ -46,27 +43,22 @@
 #include <stdexcept>
 
 namespace engine {
-    class TestApp {
+    class PointLightSystem {
         public:
-            static constexpr int WIDTH = 800;
-            static constexpr int HEIGHT = 600;
+            PointLightSystem(Device &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+            ~PointLightSystem();
+            // delete copy constructor and operator to avoid copying the renderer
+            PointLightSystem(const PointLightSystem&) = delete;
+            PointLightSystem& operator=(const PointLightSystem&) = delete;
 
-            TestApp();
-            ~TestApp();
-
-            TestApp(const TestApp&) = delete;
-            TestApp& operator=(const TestApp&) = delete;
-
-            void run();
-
+            void render(FrameInfo& frameInfo);
         private:
-            void loadGameObjects();
+            void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
+            void createPipeline(VkRenderPass renderPass);
 
-            Window window{WIDTH, HEIGHT, "Test App"};
-            Device device{window};
-            Renderer renderer{device, window};
-
-            std::unique_ptr<DescriptorPool> globalPool;
-            GameObject::Map gameObjects;
+            // device is initialized in app launcher
+            Device& device;
+            std::unique_ptr<Pipeline> pipeline;
+            VkPipelineLayout pipelineLayout;
     };
 }

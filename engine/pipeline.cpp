@@ -72,9 +72,9 @@ namespace engine
         shaderStages[1].pNext = nullptr;
         shaderStages[1].pSpecializationInfo = nullptr;
 
-        // manage the vertex input as the same description as the model
-        auto bindingDescriptions = Model::Vertex::getBindingDescription();
-        auto attributeDescriptions = Model::Vertex::getAttributeDescriptions();
+        // set binding and attribute descriptions in configInfo
+        auto &bindingDescriptions = configInfo.bindingDescriptions;
+        auto &attributeDescriptions = configInfo.attributeDescriptions;
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         vertexInputInfo.vertexAttributeDescriptionCount =
@@ -200,6 +200,9 @@ namespace engine
         configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
         configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
         configInfo.dynamicStateInfo.flags = 0;
+
+        configInfo.bindingDescriptions = Model::Vertex::getBindingDescriptions();
+        configInfo.attributeDescriptions = Model::Vertex::getAttributeDescriptions();
     }
 
     void Pipeline::bind(VkCommandBuffer commandBuffer){

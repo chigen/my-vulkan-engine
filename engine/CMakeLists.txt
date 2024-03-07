@@ -3,6 +3,7 @@ message("\n-- Engine --\n")
 # No need to include_directories("../") since it's better to use target_include_directories on specific targets
 
 file(GLOB ENGINE_SOURCE_FILES *.cpp *.hpp) # Adding *.hpp to ensure IDEs recognize headers
+file(GLOB_RECURSE ENGINE_SOURCE_FILES *.cpp *.hpp) # If you want to include files from subdirectories
 add_library(engine ${ENGINE_SOURCE_FILES})
 
 # Specify include directories for this target

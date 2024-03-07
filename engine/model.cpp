@@ -219,7 +219,7 @@ namespace engine {
         }
     }
 
-    std::vector<VkVertexInputBindingDescription> Model::Vertex::getBindingDescription(){
+    std::vector<VkVertexInputBindingDescription> Model::Vertex::getBindingDescriptions(){
         // set binding to 0
         std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
         bindingDescriptions[0].binding = 0;

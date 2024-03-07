@@ -8,7 +8,8 @@ layout(location = 0) out vec4 outColor;
 
 // for descriptor set 0 binding 0
 layout(set = 0, binding = 0) uniform GlobalUbo {
-    mat4 projectionViewMatrix;
+    mat4 projection;
+    mat4 view;
     // this is for parrallel light
     // vec3 directionToLight;
 

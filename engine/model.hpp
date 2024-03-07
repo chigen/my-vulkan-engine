@@ -16,7 +16,7 @@ namespace engine{
                 glm::vec3 normal{};
                 glm::vec2 uv{};
                 // binding description
-                static std::vector<VkVertexInputBindingDescription> getBindingDescription();
+                static std::vector<VkVertexInputBindingDescription> getBindingDescriptions();
                 // attribute descriptions
                 static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
 

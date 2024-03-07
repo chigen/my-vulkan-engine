@@ -12,7 +12,8 @@
 
 namespace engine {
     struct GlobalUbo {
-        glm::mat4 projectView{1.f};
+        glm::mat4 project{1.f};
+        glm::mat4 view{1.f};
         // this lightDirection is for parrallel light
         // glm::vec3 lightDirection = glm::normalize(glm::vec3(1.f, -3.f, -1.f));
 
@@ -21,7 +22,7 @@ namespace engine {
         glm::vec4 ambientLight{1.f, 1.f, 1.f, 0.02f};
         glm::vec3 lightPosition{-1.f};
         // r, g, b, intensity
-        alignas(16) glm::vec4 lightColor{0.5f, 1.f, 0.5f, 1.f};
+        alignas(16) glm::vec4 lightColor{1.f, 1.f, 1.f, 1.f};
     };
 
     TestApp::TestApp() {
@@ -83,7 +84,12 @@ namespace engine {
         // 3. return the image to the swap chain for presentation, calling vkQueuePresentKHR
         // (in SwapChain::submitCommandBuffers)
         // also update the current frame in flight
-        SimpleRenderSystem simpleRenderSystem(device, renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
+        SimpleRenderSystem simpleRenderSystem(device, 
+            renderer.getSwapChainRenderPass(), 
+            globalSetLayout->getDescriptorSetLayout());
+        PointLightSystem pointLightSystem(device, 
+            renderer.getSwapChainRenderPass(), 
+            globalSetLayout->getDescriptorSetLayout());
         Camera camera{};
 
         // create a camera viewer object
@@ -119,12 +125,14 @@ namespace engine {
 
                 // update
                 GlobalUbo ubo{};
-                ubo.projectView = camera.getProjection() * camera.getView();
+                ubo.project = camera.getProjection();
+                ubo.view = camera.getView();
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
                 renderer.beginSwapChainRenderPass(commandBuffer);
                 simpleRenderSystem.renderGameObjects(frameInfo);
+                pointLightSystem.render(frameInfo);
                 renderer.endSwapChainRenderPass(commandBuffer);
                 renderer.endFrame();
             }
