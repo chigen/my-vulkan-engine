@@ -1,5 +1,10 @@
 #version 450
 
+struct PointLight {
+    vec4 position;
+    vec4 color;
+};
+
 // for descriptor set 0 binding 0
 layout(set = 0, binding = 0) uniform GlobalUbo {
     mat4 projection;
@@ -9,12 +14,18 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
 
     // for point light
     vec4 ambientLightColor;
-    vec3 lightPosition;
-    vec4 lightColor;
+    PointLight pointLights[10];
+    int numLights;
 } ubo;
 
 layout (location = 0) in vec2 fragOffset;
 layout (location = 0) out vec4 outColor;
+
+layout (push_constant) uniform Push {
+    vec4 position;
+    vec4 color;
+    float radius;
+} push;
 
 void main() {
     float dis = sqrt(dot(fragOffset, fragOffset));
@@ -22,5 +33,5 @@ void main() {
         // not render the pixel outside the circle
         discard;
     }
-    outColor = vec4(ubo.lightColor.xyz, 1.0);
+    outColor = vec4(push.color.xyz, 1.0);
 }

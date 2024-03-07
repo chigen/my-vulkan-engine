@@ -12,6 +12,11 @@ layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec3 worldFragPos;
 layout(location = 2) out vec3 worldFragNormal;
 
+struct PointLight {
+    vec4 position;
+    vec4 color;
+};
+
 // for descriptor set 0 binding 0
 layout(set = 0, binding = 0) uniform GlobalUbo {
     mat4 projection;
@@ -21,8 +26,8 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
 
     // for point light
     vec4 ambientLightColor;
-    vec3 lightPosition;
-    vec4 lightColor;
+    PointLight pointLights[10];
+    int numLights;
 } ubo;
 
 // push constant only support 128 bytes => 32 floats => 2 mat4

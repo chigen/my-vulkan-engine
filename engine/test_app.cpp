@@ -11,19 +11,7 @@
 #include <chrono>
 
 namespace engine {
-    struct GlobalUbo {
-        glm::mat4 project{1.f};
-        glm::mat4 view{1.f};
-        // this lightDirection is for parrallel light
-        // glm::vec3 lightDirection = glm::normalize(glm::vec3(1.f, -3.f, -1.f));
-
-        // for point light:
-        // ambient light, w is its intensity
-        glm::vec4 ambientLight{1.f, 1.f, 1.f, 0.02f};
-        glm::vec3 lightPosition{-1.f};
-        // r, g, b, intensity
-        alignas(16) glm::vec4 lightColor{1.f, 1.f, 1.f, 1.f};
-    };
+    
 
     TestApp::TestApp() {
         // create global descriptor pool
@@ -127,6 +115,7 @@ namespace engine {
                 GlobalUbo ubo{};
                 ubo.project = camera.getProjection();
                 ubo.view = camera.getView();
+                pointLightSystem.update(frameInfo, ubo);
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
@@ -221,6 +210,26 @@ namespace engine {
         quad.transform3d.translation = {0.0f, 0.5f, 0.0f};
         quad.transform3d.scale = {3.f, 1.f, 3.f};
         gameObjects.emplace(quad.getId(), std::move(quad));
+
+        std::vector<glm::vec3> lightColors{
+            {1.f, .1f, .1f},
+            {.1f, .1f, 1.f},
+            {.1f, 1.f, .1f},
+            {1.f, 1.f, .1f},
+            {.1f, 1.f, 1.f},
+            {1.f, 1.f, 1.f}  //
+        };
+
+        for (int i = 0; i < lightColors.size(); i++) {
+            auto pointLight = GameObject::makePointLight(0.2f);
+            pointLight.color = lightColors[i];
+            auto rotateLight = glm::rotate(
+                glm::mat4(1.f),
+                (i * glm::two_pi<float>()) / lightColors.size(),
+                {0.f, -1.f, 0.f});
+            pointLight.transform3d.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
+            gameObjects.emplace(pointLight.getId(), std::move(pointLight));
+        }
 
         // create a model hard-coded with a cube
         /* std::shared_ptr<Model> cubeModel = createCubeModel(device, {0.0f, 0.0f, 0.0f});

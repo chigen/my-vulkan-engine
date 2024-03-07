@@ -25,6 +25,11 @@ namespace engine {
 
         glm::mat3 normalMatrix();
     };
+
+    struct PointLightComponent{
+        float intensity = 1.f;
+    };
+
     class GameObject {
         public:
             // every game object has a unique id
@@ -35,6 +40,12 @@ namespace engine {
                 static id_t currentId = 0;
                 return GameObject{currentId++};
             }
+
+            static GameObject makePointLight(
+                float intensity = 10.f,
+                float radius = 0.1f,
+                glm::vec3 color = glm::vec3{1.0f, 1.0f, 1.0f}
+            );
 
             // delete copy constructor and operator to avoid copying the game object
             GameObject(const GameObject&) = delete;
@@ -47,8 +58,11 @@ namespace engine {
 
             // Transform2dComponent transform2d{};
             Transform3dComponent transform3d{};
-            std::shared_ptr<Model> model;
             glm::vec3 color{};
+
+            // optional components
+            std::shared_ptr<Model> model;
+            std::unique_ptr<PointLightComponent> pointLight = nullptr;
 
         private:
             GameObject(id_t objId) : id{objId} {}

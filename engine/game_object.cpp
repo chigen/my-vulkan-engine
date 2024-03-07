@@ -60,4 +60,14 @@ namespace engine {
         // because rotation matrix is orthogonal and scale matrix is diagonal
         return glm::mat3(glm::transpose(glm::inverse(mat4())));
     }
+
+    GameObject GameObject::makePointLight(float intensity, float radius, glm::vec3 color) {
+        
+        GameObject obj = createGameObject();
+        obj.color = color;
+        obj.transform3d.scale.x = radius;
+        obj.pointLight = std::make_unique<PointLightComponent>();
+        obj.pointLight->intensity = intensity;
+        return obj;
+    }
 }
