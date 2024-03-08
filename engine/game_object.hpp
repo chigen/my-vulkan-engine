@@ -61,7 +61,7 @@ namespace engine {
             glm::vec3 color{};
 
             // optional components
-            std::shared_ptr<Model> model;
+            std::shared_ptr<Model> model{};
             std::unique_ptr<PointLightComponent> pointLight = nullptr;
 
         private:

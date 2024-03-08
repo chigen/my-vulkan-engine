@@ -105,7 +105,7 @@ namespace engine {
 
         for (auto& kv : frameInfo.gameObjects) {
             auto& obj = kv.second;
-            if (obj.model == nullptr) continue;
+            if (obj.pointLight == nullptr) continue;
 
             PointLightPushConstantData push{};
             push.position = glm::vec4(obj.transform3d.translation, 1.f);

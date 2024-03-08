@@ -87,6 +87,8 @@ namespace engine {
 
         auto currentTime = std::chrono::high_resolution_clock::now();
 
+        std::cout<<"Start running the app"<<std::endl;
+
         while (!window.shouldClose()) {
             glfwPollEvents();
 
@@ -100,6 +102,8 @@ namespace engine {
             float aspect = renderer.getAspectRatio();
             // camera.setOrthographicProjection(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
             camera.setPerspectiveProjection(glm::radians(100.0f), aspect, 0.1f, 100.0f);
+
+            std::cout<<"Before begining the frame "<<std::endl;
 
             if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
@@ -116,13 +120,20 @@ namespace engine {
                 ubo.project = camera.getProjection();
                 ubo.view = camera.getView();
                 pointLightSystem.update(frameInfo, ubo);
+
+                std::cout<<"updated point light "<<std::endl;
+
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
                 renderer.beginSwapChainRenderPass(commandBuffer);
+                std::cout<<"beginned swap chain render pass "<<std::endl;
                 simpleRenderSystem.renderGameObjects(frameInfo);
+                std::cout<<"rendered game objects "<<std::endl;
                 pointLightSystem.render(frameInfo);
+                std::cout<<"rendered point light "<<std::endl;
                 renderer.endSwapChainRenderPass(commandBuffer);
+                std::cout<<"ended swap chain render pass "<<std::endl;
                 renderer.endFrame();
             }
         }
@@ -217,7 +228,7 @@ namespace engine {
             {.1f, 1.f, .1f},
             {1.f, 1.f, .1f},
             {.1f, 1.f, 1.f},
-            {1.f, 1.f, 1.f}  //
+            {1.f, 1.f, 1.f}  
         };
 
         for (int i = 0; i < lightColors.size(); i++) {
