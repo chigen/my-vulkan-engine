@@ -58,9 +58,12 @@ namespace engine {
             void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
             void createPipeline(VkRenderPass renderPass);
 
+            glm::mat4 createRotations(int axis, float rotationSpeed);
+
             // device is initialized in app launcher
             Device& device;
             std::unique_ptr<Pipeline> pipeline;
             VkPipelineLayout pipelineLayout;
+
     };
 }

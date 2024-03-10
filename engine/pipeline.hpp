@@ -61,6 +61,7 @@ namespace engine
 
             static void defaultPipelineConfigInfo(
                 PipelineConfigInfo& configinfo);
+            static void enableAlphaBlending(PipelineConfigInfo& configInfo);
 
         private:
             static std::vector<char> readFile (const std::string& filename);

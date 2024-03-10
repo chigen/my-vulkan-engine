@@ -103,7 +103,7 @@ namespace engine {
             // camera.setOrthographicProjection(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
             camera.setPerspectiveProjection(glm::radians(100.0f), aspect, 0.1f, 100.0f);
 
-            std::cout<<"Before begining the frame "<<std::endl;
+            // std::cout<<"Before begining the frame "<<std::endl;
 
             if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
@@ -122,19 +122,19 @@ namespace engine {
                 ubo.inverseView = camera.getInverseView();
                 pointLightSystem.update(frameInfo, ubo);
 
-                std::cout<<"updated point light "<<std::endl;
+                // std::cout<<"updated point light "<<std::endl;
 
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
                 renderer.beginSwapChainRenderPass(commandBuffer);
-                std::cout<<"beginned swap chain render pass "<<std::endl;
+                // std::cout<<"beginned swap chain render pass "<<std::endl;
                 simpleRenderSystem.renderGameObjects(frameInfo);
-                std::cout<<"rendered game objects "<<std::endl;
+                // std::cout<<"rendered game objects "<<std::endl;
                 pointLightSystem.render(frameInfo);
-                std::cout<<"rendered point light "<<std::endl;
+                // std::cout<<"rendered point light "<<std::endl;
                 renderer.endSwapChainRenderPass(commandBuffer);
-                std::cout<<"ended swap chain render pass "<<std::endl;
+                // std::cout<<"ended swap chain render pass "<<std::endl;
                 renderer.endFrame();
             }
         }
@@ -236,10 +236,15 @@ namespace engine {
             auto pointLight = GameObject::makePointLight(0.2f);
             pointLight.color = lightColors[i];
             auto rotateLight = glm::rotate(
-                glm::mat4(1.f),
+                glm::mat4(.5f),
                 (i * glm::two_pi<float>()) / lightColors.size(),
                 {0.f, -1.f, 0.f});
             pointLight.transform3d.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
+            pointLight.transform3d.translation.y -= 0.8f;
+            pointLight.transform3d.translation.x -= i * 0.05;
+            std::cout << "point light's position:" << pointLight.transform3d.translation.x 
+                << " " << pointLight.transform3d.translation.y << " " 
+                << pointLight.transform3d.translation.z << std::endl;
             gameObjects.emplace(pointLight.getId(), std::move(pointLight));
         }
 

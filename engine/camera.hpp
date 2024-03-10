@@ -30,6 +30,7 @@ namespace engine{
             const glm::mat4& getProjection() const { return projection; }
             const glm::mat4& getView() const { return view; }
             const glm::mat4& getInverseView() const { return inverseView; }
+            const glm::vec3& getPosition() const { return inverseView[3]; }
 
         private:
             glm::mat4 projection{1.f};
