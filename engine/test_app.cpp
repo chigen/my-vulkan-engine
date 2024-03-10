@@ -119,6 +119,7 @@ namespace engine {
                 GlobalUbo ubo{};
                 ubo.project = camera.getProjection();
                 ubo.view = camera.getView();
+                ubo.inverseView = camera.getInverseView();
                 pointLightSystem.update(frameInfo, ubo);
 
                 std::cout<<"updated point light "<<std::endl;

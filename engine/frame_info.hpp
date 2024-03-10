@@ -19,6 +19,7 @@ namespace engine {
     struct GlobalUbo {
         glm::mat4 project{1.f};
         glm::mat4 view{1.f};
+        glm::mat4 inverseView{1.f};
         // this lightDirection is for parrallel light
         // glm::vec3 lightDirection = glm::normalize(glm::vec3(1.f, -3.f, -1.f));
 

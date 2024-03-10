@@ -29,10 +29,12 @@ namespace engine{
 
             const glm::mat4& getProjection() const { return projection; }
             const glm::mat4& getView() const { return view; }
+            const glm::mat4& getInverseView() const { return inverseView; }
 
         private:
             glm::mat4 projection{1.f};
             glm::mat4 view{1.f};
+            glm::mat4 inverseView{1.f};
     };
     
 } // namespace engin
