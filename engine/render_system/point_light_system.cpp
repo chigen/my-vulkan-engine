@@ -78,16 +78,16 @@ namespace engine {
         
         else if(axis == 2){
             // rotate around z axis
-            glm::mat4 translateToOrigin = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.3f, 0.0f));
-            glm::mat4 translateBack = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.3f, 0.0f));
+            glm::mat4 translateToOrigin = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.f, 0.0f));
+            glm::mat4 translateBack = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -2.f, 0.0f));
             glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), rotationSpeed, glm::vec3(0.0f, 0.0f, -1.0f));
             return translateBack * rotateZ * translateToOrigin;
         }
         
         else if(axis == 0) {
             // rotate around x axis
-            glm::mat4 translateToOrigin = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.3f, 0.0f));
-            glm::mat4 translateBack = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.3f, 0.0f));
+            glm::mat4 translateToOrigin = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 2.f, 0.0f));
+            glm::mat4 translateBack = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -2.f, 0.0f));
             glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), rotationSpeed, glm::vec3(-1.0f, 0.0f, 0.0f));
             return translateBack * rotateX * translateToOrigin;
         }      

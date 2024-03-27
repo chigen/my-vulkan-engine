@@ -231,7 +231,19 @@ namespace engine {
             {.1f, 1.f, 1.f},
             {1.f, 1.f, 1.f}  
         };
-
+        std::vector<glm::mat4> rotations;
+        // rotate around x axis 1
+        rotations.push_back(glm::rotate(glm::mat4(1.f), (-0.125f * glm::two_pi<float>()), {0.f, -1.f, 0.f}));
+        // rotate around y axis 1
+        rotations.push_back(glm::rotate(glm::mat4(1.f), (-0.125f * glm::two_pi<float>()), {0.f, -1.f, 0.f}));
+        // rotate around z axis 1
+        rotations.push_back(glm::rotate(glm::mat4(1.f), (0.125f * glm::two_pi<float>()), {0.f, -1.f, 0.f}));
+        // rotate around x axis 2
+        rotations.push_back(glm::rotate(glm::mat4(1.f), (0.375f * glm::two_pi<float>()), {0.f, -1.f, 0.f}));
+        // rotate around y axis 2
+        rotations.push_back(glm::rotate(glm::mat4(1.f), (0.375f * glm::two_pi<float>()), {0.f, -1.f, 0.f}));
+        // rotate around z axis 2
+        rotations.push_back(glm::rotate(glm::mat4(1.f), (0.625f * glm::two_pi<float>()), {0.f, -1.f, 0.f}));
         for (int i = 0; i < lightColors.size(); i++) {
             auto pointLight = GameObject::makePointLight(0.2f);
             pointLight.color = lightColors[i];
@@ -239,9 +251,13 @@ namespace engine {
                 glm::mat4(.5f),
                 (i * glm::two_pi<float>()) / lightColors.size(),
                 {0.f, -1.f, 0.f});
-            pointLight.transform3d.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
-            pointLight.transform3d.translation.y -= 0.8f;
-            pointLight.transform3d.translation.x -= i * 0.05;
+            pointLight.transform3d.translation = glm::vec3(rotations[i] * glm::vec4(-1.f, -1.f, -1.f, 1.f));
+            pointLight.transform3d.translation.y -= 1.f;
+            if(i==0)
+                pointLight.transform3d.translation.x -= 0.5f;
+            else if(i==3)
+                pointLight.transform3d.translation.x += 0.3f;
+            // pointLight.transform3d.translation.x -= i * 0.1;
             std::cout << "point light's position:" << pointLight.transform3d.translation.x 
                 << " " << pointLight.transform3d.translation.y << " " 
                 << pointLight.transform3d.translation.z << std::endl;
